@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\D2M.Data\D2M.Data.csproj" />
+  </ItemGroup>
+</Project>

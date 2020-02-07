@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using D2M.Bot;
+using D2M.Data;
+using D2M.Services;
 using D2M.Web.HostedBot;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +27,11 @@ namespace D2M.Web
 
             services.AddBotClient();
 
-            services.AddHostedService<BotHostedService>();
+            services
+                .AddDbContext<EntityContext>(x => x.UseSqlite(Configuration.GetConnectionString("Default")))
+                .AddTransient<IBehaviourConfigurationService, BehaviourConfigurationService>()
+                .AddSingleton<ICachedBehaviourConfiguration, CachedBehaviourConfiguration>()
+                .AddHostedService<BotHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

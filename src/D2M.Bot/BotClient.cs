@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using D2M.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -18,6 +19,7 @@ namespace D2M.Bot
     {
         private readonly ILogger<BotClient> _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICachedBehaviourConfiguration _cachedBehaviourConfiguration;
 
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly CommandService _commandService;
@@ -27,14 +29,15 @@ namespace D2M.Bot
         public BotClient(ILogger<BotClient> logger, 
             IServiceProvider serviceProvider, 
             IOptions<BotConfiguration> botConfiguration, 
-            DiscordSocketClient discordSocketClient, 
-            CommandService commandService)
+            ICachedBehaviourConfiguration cachedBehaviourConfiguration, 
+            DiscordSocketClient discordSocketClient, CommandService commandService)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
 
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
+            _cachedBehaviourConfiguration = cachedBehaviourConfiguration;
 
             _botConfiguration = botConfiguration.Value;
         }
@@ -63,9 +66,15 @@ namespace D2M.Bot
                 || message.Author.IsWebhook) 
                 return;
 
+            if (_cachedBehaviourConfiguration.IsDisabled)
+                return;
+
+            var commandPrefix = _cachedBehaviourConfiguration.Prefix;
+
             var argPos = 0;
 
-            if (!receivedMessage.HasCharPrefix('?', ref argPos) 
+            if (!(receivedMessage.Channel is IDMChannel)
+                && !receivedMessage.HasCharPrefix(commandPrefix, ref argPos) 
                 && !receivedMessage.HasMentionPrefix(_discordSocketClient.CurrentUser, ref argPos)) 
                 return;
 

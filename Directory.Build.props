@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>0DCAFE0B-8DA3-47FE-ACBC-AE8D4C819DFD</UserSecretsId>
-    <nullable>enable</nullable>
+    <Nullable>enable</Nullable>
     <RestoreSources>
       https://api.nuget.org/v3/index.json;
       https://www.myget.org/F/discord-net/api/v3/index.json;

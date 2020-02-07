@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Handlers\" />
+    <ProjectReference Include="..\D2M.Services\D2M.Services.csproj" />
   </ItemGroup>
 
 </Project>
