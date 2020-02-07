@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using D2M.Bot.Services;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using MediatR;
@@ -27,7 +29,9 @@ namespace D2M.Bot
             return collection
                 .AddOptions()
                 .Configure<BotConfiguration>(configuration)
+                .AddSingleton<IDiscordGuildService, DiscordGuildService>()
                 .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<InteractiveService>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<IBotClient, BotClient>()
                 .AddMediatR(x => x.AsScoped(), typeof(BotClient).Assembly);

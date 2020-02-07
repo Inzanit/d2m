@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "D2M.Services", "src\D2M.Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "D2M.Bot", "src\D2M.Bot\D2M.Bot.csproj", "{51F052E0-196F-44B7-A96E-5A15B1E5AA7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D2M.Data", "src\D2M.Data\D2M.Data.csproj", "{526179F0-1EA1-41AC-8C4C-2AC995401C50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "D2M.Data", "src\D2M.Data\D2M.Data.csproj", "{526179F0-1EA1-41AC-8C4C-2AC995401C50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D2M.Common", "D2M.Common\D2M.Common.csproj", "{881B6911-B08F-4672-BF28-A5E665117B82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{526179F0-1EA1-41AC-8C4C-2AC995401C50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{526179F0-1EA1-41AC-8C4C-2AC995401C50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{526179F0-1EA1-41AC-8C4C-2AC995401C50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{881B6911-B08F-4672-BF28-A5E665117B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{881B6911-B08F-4672-BF28-A5E665117B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{881B6911-B08F-4672-BF28-A5E665117B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{881B6911-B08F-4672-BF28-A5E665117B82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

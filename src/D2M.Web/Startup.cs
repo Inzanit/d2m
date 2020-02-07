@@ -30,6 +30,7 @@ namespace D2M.Web
             services
                 .AddDbContext<EntityContext>(x => x.UseSqlite(Configuration.GetConnectionString("Default")))
                 .AddTransient<IBehaviourConfigurationService, BehaviourConfigurationService>()
+                .AddTransient<IThreadService, ThreadService>()
                 .AddSingleton<ICachedBehaviourConfiguration, CachedBehaviourConfiguration>()
                 .AddHostedService<BotHostedService>();
         }

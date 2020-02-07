@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using D2M.Bot.Handlers;
+using D2M.Common.Extensions;
 using D2M.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -73,14 +77,30 @@ namespace D2M.Bot
 
             var argPos = 0;
 
+            var isIntendedForCommand = receivedMessage.HasCharPrefix(commandPrefix, ref argPos);
+            var isIntendedForMention = receivedMessage.HasMentionPrefix(_discordSocketClient.CurrentUser, ref argPos);
+
             if (!(receivedMessage.Channel is IDMChannel)
-                && !receivedMessage.HasCharPrefix(commandPrefix, ref argPos) 
-                && !receivedMessage.HasMentionPrefix(_discordSocketClient.CurrentUser, ref argPos)) 
+                && !isIntendedForCommand
+                && !isIntendedForMention) 
                 return;
 
-            var context = new SocketCommandContext(_discordSocketClient, receivedMessage);
+            // If this is a command, we don't care where this is happening (yet?)
+            // just create the context and fire off to D.NET
+            if (isIntendedForCommand)
+            {
+                var context = new SocketCommandContext(_discordSocketClient, receivedMessage);
 
-            await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
+                await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
+            }
+            // If we're in a direct message channel, forward the raw message
+            else if (receivedMessage.Channel is IDMChannel)
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                mediator.Publish(new DirectMessageReceivedNotification(receivedMessage)).FireAndForget();
+            }
         }
 
         private Task OnCommandExecuted(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
