@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using D2M.Bot.Handlers;
 using D2M.Bot.Services;
 using Discord.Addons.Interactive;
 using Discord.Commands;
@@ -38,6 +37,7 @@ namespace D2M.Bot
                 .AddTransient<IScopedMediator, ScopedMediator>()
                 .AddTransient<IDiscordMessageService, DiscordMessageService>()
                 .AddTransient<IDiscordPresenceService, DiscordPresenceService>()
+                .AddTransient<IPermissionService, PermissionService>()
                 .AddMediatR(x => x.AsScoped(), typeof(BotClient).Assembly);
         }
     }

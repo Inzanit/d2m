@@ -12,10 +12,12 @@ namespace D2M.Services
         Task Configure();
         Task SetPrefix(char newPrefix);
         char GetPrefix();
-        ulong? GetStaffRole();
+        ulong? GetStaffRoleId();
         ulong? GetCategoryId();
         ulong? GetLogChannelId();
         Task SetCategory(ulong categoryId);
+        Task SetLogChannel(ulong logChannelId);
+        Task SetStaffRole(ulong roleId);
     }
 
     public class BehaviourConfigurationService : IBehaviourConfigurationService
@@ -117,12 +119,44 @@ namespace D2M.Services
             _cachedBehaviourConfiguration.ParentCategoryId = categoryId;
         }
 
+        public async Task SetLogChannel(ulong logChannelId)
+        {
+            const string CONFIGURATION_NAME = nameof(_cachedBehaviourConfiguration.LogsChannelId);
+
+            var configuration = await _db
+                .Configurations
+                .Where(x => x.Property == CONFIGURATION_NAME)
+                .SingleAsync();
+
+            configuration.Update(logChannelId.ToString());
+
+            await _db.SaveChangesAsync();
+
+            _cachedBehaviourConfiguration.LogsChannelId = logChannelId;
+        }
+
+        public async Task SetStaffRole(ulong roleId)
+        {
+            const string CONFIGURATION_NAME = nameof(_cachedBehaviourConfiguration.StaffRoleId);
+
+            var configuration = await _db
+                .Configurations
+                .Where(x => x.Property == CONFIGURATION_NAME)
+                .SingleAsync();
+
+            configuration.Update(roleId.ToString());
+
+            await _db.SaveChangesAsync();
+
+            _cachedBehaviourConfiguration.StaffRoleId = roleId;
+        }
+
         public char GetPrefix()
         {
             return _cachedBehaviourConfiguration.Prefix;
         }
 
-        public ulong? GetStaffRole()
+        public ulong? GetStaffRoleId()
         {
             return _cachedBehaviourConfiguration.StaffRoleId;
         }
