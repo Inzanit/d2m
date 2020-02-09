@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\D2M.Common\D2M.Common.csproj" />
+    <ProjectReference Include="..\D2M.Common\D2M.Common.csproj" />
     <ProjectReference Include="..\D2M.Services\D2M.Services.csproj" />
   </ItemGroup>
 
