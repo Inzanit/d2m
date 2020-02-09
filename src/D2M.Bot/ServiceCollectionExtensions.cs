@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using D2M.Bot.Handlers;
 using D2M.Bot.Services;
 using Discord.Addons.Interactive;
 using Discord.Commands;
@@ -29,11 +30,14 @@ namespace D2M.Bot
             return collection
                 .AddOptions()
                 .Configure<BotConfiguration>(configuration)
-                .AddSingleton<IDiscordGuildService, DiscordGuildService>()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<IBotClient, BotClient>()
+                .AddSingleton<IDiscordGuildService, DiscordGuildService>()
+                .AddTransient<IScopedMediator, ScopedMediator>()
+                .AddTransient<IDiscordMessageService, DiscordMessageService>()
+                .AddTransient<IDiscordPresenceService, DiscordPresenceService>()
                 .AddMediatR(x => x.AsScoped(), typeof(BotClient).Assembly);
         }
     }

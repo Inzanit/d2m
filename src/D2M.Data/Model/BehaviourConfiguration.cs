@@ -12,6 +12,11 @@ namespace D2M.Data.Model
         public string Property { get; internal set; } = null!;
         public string Value { get; internal set; } = null!;
         public ConfigurationType Type { get; internal set; }
+
+        public void Update(string value)
+        {
+            Value = value;
+        }
     }
 
     public class ConfigurationEntityTypeConfiguration : IEntityTypeConfiguration<BehaviourConfiguration>
@@ -46,6 +51,12 @@ namespace D2M.Data.Model
             {
                 Id = 5,
                 Property = "LogsChannelId",
+                Value = "",
+                Type = ConfigurationType.Ulong,
+            }, new BehaviourConfiguration
+            {
+                Id = 6,
+                Property = "StaffRoleId",
                 Value = "",
                 Type = ConfigurationType.Ulong,
             });

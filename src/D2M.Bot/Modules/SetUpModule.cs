@@ -1,39 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using D2M.Bot.Handlers;
+using D2M.Bot.Services;
+using D2M.Common.Extensions;
 using D2M.Services;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
+using MediatR;
 
 namespace D2M.Bot.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator)]
     public class SetUpModule : InteractiveBase
     {
-        private readonly ICachedBehaviourConfiguration _cachedBehaviourConfiguration;
+        private readonly IScopedMediator _mediator;
 
-        public SetUpModule(ICachedBehaviourConfiguration cachedBehaviourConfiguration)
+        public SetUpModule(IScopedMediator mediator)
         {
-            _cachedBehaviourConfiguration = cachedBehaviourConfiguration;
+            _mediator = mediator;
         }
 
         [Command("setup")]
-        public async Task SetUp()
+        public Task SetUp()
         {
-            await InlineReactionReplyAsync(new ReactionCallbackData("D2M has already been set up in this guild, would you like to run the set up again?")
-                .WithCallback(new Emoji("👍"), (context, reaction) => RunSetup())
-                .WithCallback(new Emoji("👎"), (context, reaction) => reaction.Message.Value.DeleteAsync()));
+            _mediator.Publish(new SetUpRequest(Context.Message)).FireAndForget();
 
-            if (_cachedBehaviourConfiguration.HasDoneInitialSetUp)
-            {
-                return;
-            }
-        }
-
-        private Task RunSetup()
-        {
             return Task.CompletedTask;
         }
     }

@@ -22,7 +22,7 @@ namespace D2M.Bot
     public class BotClient : IBotClient
     {
         private readonly ILogger<BotClient> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ICachedBehaviourConfiguration _cachedBehaviourConfiguration;
 
         private readonly DiscordSocketClient _discordSocketClient;
@@ -30,14 +30,14 @@ namespace D2M.Bot
         
         private readonly BotConfiguration _botConfiguration;
 
-        public BotClient(ILogger<BotClient> logger, 
-            IServiceProvider serviceProvider, 
+        public BotClient(ILogger<BotClient> logger,
+            IServiceScopeFactory serviceScopeFactory, 
             IOptions<BotConfiguration> botConfiguration, 
             ICachedBehaviourConfiguration cachedBehaviourConfiguration, 
             DiscordSocketClient discordSocketClient, CommandService commandService)
         {
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _serviceScopeFactory = serviceScopeFactory;
 
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
@@ -56,7 +56,8 @@ namespace D2M.Bot
 
             _commandService.CommandExecuted += OnCommandExecuted;
 
-            await _commandService.AddModulesAsync(typeof(BotClient).Assembly, _serviceProvider);
+            using var scope = _serviceScopeFactory.CreateScope();
+            await _commandService.AddModulesAsync(typeof(BotClient).Assembly, scope.ServiceProvider);
             await _discordSocketClient.LoginAsync(TokenType.Bot, _botConfiguration.DiscordToken);
 
             await _discordSocketClient.StartAsync();
@@ -85,20 +86,20 @@ namespace D2M.Bot
                 && !isIntendedForMention) 
                 return;
 
+            using var scope = _serviceScopeFactory.CreateScope();
+
             // If this is a command, we don't care where this is happening (yet?)
             // just create the context and fire off to D.NET
             if (isIntendedForCommand)
             {
                 var context = new SocketCommandContext(_discordSocketClient, receivedMessage);
 
-                await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
+                await _commandService.ExecuteAsync(context, argPos, scope.ServiceProvider);
             }
             // If we're in a direct message channel, forward the raw message
             else if (receivedMessage.Channel is IDMChannel)
             {
-                using var scope = _serviceProvider.CreateScope();
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
                 mediator.Publish(new DirectMessageReceivedNotification(receivedMessage)).FireAndForget();
             }
         }

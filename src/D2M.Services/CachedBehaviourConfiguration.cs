@@ -9,6 +9,7 @@ namespace D2M.Services
         bool IsDisabled { get; set; }
         ulong? ParentCategoryId { get; set; }
         ulong? LogsChannelId { get; set; }
+        ulong? StaffRoleId { get; set; }
     }
 
     public class CachedBehaviourConfiguration : ICachedBehaviourConfiguration
@@ -18,5 +19,6 @@ namespace D2M.Services
         public bool IsDisabled { get; set; }
         public ulong? ParentCategoryId { get; set; }
         public ulong? LogsChannelId { get; set; }
+        public ulong? StaffRoleId { get; set; }
     }
 }
