@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 
 namespace D2M.Web
 {
@@ -13,20 +15,29 @@ namespace D2M.Web
     {
         public static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
+
             var hostBuilder = CreateHostBuilder(args).Build();
 
             try
             {
                 await MigrateDatabase(hostBuilder.Services);
                 await SetupBehaviourConfigurations(hostBuilder.Services);
+                await hostBuilder.RunAsync();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                Log.Fatal(e, "It's dead, Jim");
             }
-
-            await hostBuilder.RunAsync();
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         private static async Task MigrateDatabase(IServiceProvider serviceProvider)
@@ -48,6 +59,7 @@ namespace D2M.Web
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseSerilog();
     }
 }
