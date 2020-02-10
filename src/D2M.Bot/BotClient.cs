@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using D2M.Bot.Handlers;
-using D2M.Common.Extensions;
+using D2M.Bot.Services;
 using D2M.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -63,16 +62,16 @@ namespace D2M.Bot
             await _discordSocketClient.StartAsync();
         }
 
-        private async Task OnMessageReceived(SocketMessage message)
+        private Task OnMessageReceived(SocketMessage message)
         {
             // Anything that isn't from an actual user, ignore
             if (!(message is SocketUserMessage receivedMessage) 
                 || message.Author.IsBot 
-                || message.Author.IsWebhook) 
-                return;
+                || message.Author.IsWebhook)
+                return Task.CompletedTask;
 
             if (_cachedBehaviourConfiguration.IsDisabled)
-                return;
+                return Task.CompletedTask;
 
             var commandPrefix = _cachedBehaviourConfiguration.Prefix;
 
@@ -83,8 +82,8 @@ namespace D2M.Bot
 
             if (!(receivedMessage.Channel is IDMChannel)
                 && !isIntendedForCommand
-                && !isIntendedForMention) 
-                return;
+                && !isIntendedForMention)
+                return Task.CompletedTask;
 
             using var scope = _serviceScopeFactory.CreateScope();
 
@@ -92,16 +91,29 @@ namespace D2M.Bot
             // just create the context and fire off to D.NET
             if (isIntendedForCommand)
             {
-                var context = new SocketCommandContext(_discordSocketClient, receivedMessage);
-
-                await _commandService.ExecuteAsync(context, argPos, scope.ServiceProvider);
+                Task.Run(async () => await ForwardCommand(argPos, receivedMessage));
             }
             // If we're in a direct message channel, forward the raw message
             else if (receivedMessage.Channel is IDMChannel)
             {
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                mediator.Publish(new DirectMessageReceivedNotification(receivedMessage)).FireAndForget();
+                Task.Run(async () => await ForwardMessage(receivedMessage));
             }
+
+            return Task.CompletedTask;
+        }
+
+        private async Task ForwardCommand(int argPos, SocketUserMessage message)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var context = new SocketCommandContext(_discordSocketClient, message);
+            await _commandService.ExecuteAsync(context, argPos, scope.ServiceProvider);
+        }
+
+        private async Task ForwardMessage(SocketUserMessage message)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
+            await mediator.Publish(new DirectMessageReceivedNotification(message));
         }
 
         private Task OnCommandExecuted(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)

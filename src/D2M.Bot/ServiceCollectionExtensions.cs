@@ -38,6 +38,7 @@ namespace D2M.Bot
                 .AddTransient<IDiscordMessageService, DiscordMessageService>()
                 .AddTransient<IDiscordPresenceService, DiscordPresenceService>()
                 .AddTransient<IPermissionService, PermissionService>()
+                .AddTransient<IWorkflowService, WorkflowService>()
                 .AddMediatR(x => x.AsScoped(), typeof(BotClient).Assembly);
         }
     }

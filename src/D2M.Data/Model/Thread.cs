@@ -6,14 +6,22 @@ namespace D2M.Data.Model
 {
     public class Thread
     {
-        public Guid Id { get; set; }
-        public ulong AssignedDiscordChannelId { get; set; }
-        public ulong OpenedByDiscordUserId { get; set; }
-        public DateTime OpenedDateTime { get; set; }
+        public Thread(ulong assignedDiscordChannelId, ulong openedByDiscordUserId, DateTime openedDateTime)
+        {
+            Id = Guid.NewGuid();
+            AssignedDiscordChannelId = assignedDiscordChannelId;
+            OpenedByDiscordUserId = openedByDiscordUserId;
+            OpenedDateTime = openedDateTime;
+        }
 
-        public ulong ClosedByDiscordUserId { get; set; }
-        public DateTime? ClosedDateTime { get; set; }
+        public Guid Id { get; internal set; }
+        public ulong AssignedDiscordChannelId { get; internal set; }
+        public ulong OpenedByDiscordUserId { get; internal set; }
+        public DateTime OpenedDateTime { get; internal set; }
 
-        public ICollection<Message> Messages { get; set; } = null!;
+        public ulong ClosedByDiscordUserId { get; internal set; }
+        public DateTime? ClosedDateTime { get; internal set; }
+
+        public ICollection<Message> Messages { get; internal set; } = null!;
     }
 }

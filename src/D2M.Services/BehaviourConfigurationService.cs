@@ -8,7 +8,7 @@ namespace D2M.Services
 {
     public interface IBehaviourConfigurationService
     {
-        bool HasDoneInitialSetup();
+        bool HasValidConfiguration();
         Task Configure();
         Task SetPrefix(char newPrefix);
         char GetPrefix();
@@ -32,9 +32,10 @@ namespace D2M.Services
             _cachedBehaviourConfiguration = cachedBehaviourConfiguration;
         }
 
-        public bool HasDoneInitialSetup()
+        public bool HasValidConfiguration()
         {
-            return _cachedBehaviourConfiguration.HasDoneInitialSetUp;
+            return _cachedBehaviourConfiguration.StaffRoleId != null
+                   && _cachedBehaviourConfiguration.ParentCategoryId != null;
         }
 
         public async Task Configure()
